@@ -1,3 +1,0 @@
-C:\test\java\
-nope
-jdk-17
