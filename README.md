@@ -9,8 +9,7 @@ Windows 开发环境常用脚本集，按脚本类型分目录组织。
 ```
 script-kit/
 ├── cmd/                  # 批处理脚本（.cmd）
-│   ├── MySQL57.cmd
-│   ├── MySQL80.cmd
+│   ├── MySQL.cmd
 │   ├── Oracle.cmd
 │   ├── Redis.cmd
 │   ├── SVN.cmd
@@ -33,9 +32,8 @@ script-kit/
 
 | 脚本 | 服务 | 说明 |
 | ---- | ---- | ---- |
-| `cmd/MySQL57.cmd` | MySQL57 | 启动 / 停止 / 重启 MySQL 5.7 服务 |
-| `cmd/MySQL80.cmd` | MySQL80 | 启动 / 停止 / 重启 MySQL 8.0 服务 |
-| `cmd/Oracle.cmd` | Oracle（可配置） | 启动 / 停止 / 重启 Oracle 服务，服务名、监听器名与 SID 可在启动时配置（默认 XE 版） |
+| `cmd/MySQL.cmd` | MySQL80（默认） | 启动 / 停止 / 重启 MySQL 服务。默认服务名 `MySQL80`，用于 MySQL 5.7 时改文件开头的 `serviceName` 为 `MySQL57` 即可 |
+| `cmd/Oracle.cmd` | Oracle（可配置） | 启动 / 停止 / 重启 Oracle 服务，服务名、监听器名与 SID 可在启动时配置（默认 XE；监听器服务名随版本不同，详见脚本注释） |
 | `cmd/Redis.cmd` | Redis | 启动 / 停止 / 重启 Redis 服务 |
 | `cmd/SVN.cmd` | VisualSVNServer | 启动 / 停止 / 重启 VisualSVN 服务 |
 

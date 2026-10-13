@@ -1,5 +1,6 @@
 @ECHO off
-:: 设置服务名
+setlocal
+:: 设置服务名（MySQL 8.0 为 MySQL80，MySQL 5.7 为 MySQL57，按本机安装版本修改）
 set "serviceName=MySQL80"
 :: 设置窗口字体颜色
 color 0a
@@ -70,6 +71,7 @@ if "%id%"=="1" (
 :startup
 echo.
 call :checkState 1
+if errorlevel 1 exit /B 1
 echo.Startup %serviceName%...
 net start %serviceName%
 if errorlevel 1 (
@@ -77,12 +79,13 @@ if errorlevel 1 (
     exit /B 1
 )
 echo.%serviceName% started successfully!
-exit /B
+exit /B 0
 
 :: 停止
 :shutdown
 echo.
 call :checkState 2
+if errorlevel 1 exit /B 1
 echo.Shutdown %serviceName%...
 net stop %serviceName%
 if errorlevel 1 (
@@ -90,14 +93,14 @@ if errorlevel 1 (
     exit /B 1
 )
 echo.%serviceName% stopped successfully!
-exit /B
+exit /B 0
 
-:: 重启
+:: 重启（服务未运行时跳过停止步骤，直接启动）
 :reboot
 call :shutdown
 ping -n 5 127.0.0.1 > nul
 call :startup
-exit /B
+exit /B 0
 
 :: 退出到菜单
 :quit
@@ -116,6 +119,9 @@ if not ERRORLEVEL 1 (
 )
 
 :: 检查服务运行状态（参数: 1=启动前检查 2=停止前检查）
+:: 返回: 0=状态允许继续 1=状态不符（已提示并返回菜单）
+:: 必须用 exit /B 返回调用方，不能用 goto 跳回 :quit——
+:: goto 不会弹出 call 压入的返回地址，累积到 335 帧时 cmd 会中止整个批处理
 :: 使用 sc query 而非 tasklist，避免进程名子串误匹配
 :: （例如 mysqld 会同时匹配 MySQL57 与 MySQL80 的进程）
 :: 中间状态 START_PENDING/STOP_PENDING 分别归入运行中/已停止
@@ -123,15 +129,15 @@ if not ERRORLEVEL 1 (
 sc query %serviceName% | findstr /I /C:"RUNNING" /C:"START_PENDING" > nul
 if "%1"=="1" (
     if not errorlevel 1 (
-        echo Warning: %serviceName% started
-        goto quit
+        echo Warning: %serviceName% is already started
+        exit /B 1
     )
 )
 sc query %serviceName% | findstr /I /C:"STOPPED" /C:"STOP_PENDING" > nul
 if "%1"=="2" (
     if not errorlevel 1 (
         echo Warning: %serviceName% is not started
-        goto quit
+        exit /B 1
     )
 )
-exit /B
+exit /B 0
